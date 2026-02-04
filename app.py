@@ -77,7 +77,7 @@ tab1, tab2 = st.tabs(["🛠 TAB 1: Servicios", "📊 TAB 2: Labor (Manage)"])
 
 # --- TAB 1: SERVICIOS ---
 with tab1:
-    col_a, col_b = st.columns(2)
+    col_a, col_b = st.columns(6)
     
     with col_a:
         st.subheader("Configuración de Servicio")
@@ -125,7 +125,7 @@ with tab1:
 # --- TAB 2: LABOR ---
 with tab2:
     st.subheader("Cálculos de Labor / Manage (Lacostw41)")
-    col_l1, col_l2 = st.columns(2)
+    col_l1, col_l2 = st.columns(6)
     
     with col_l1:
         # Seleccionamos si es Machine Category o Brand Rate Full
