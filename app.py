@@ -124,41 +124,70 @@ with tab1:
 
 # --- TAB 2: LABOR ---
 with tab2:
-    st.subheader("Cálculos de Labor / Manage")
+    st.subheader("Cálculos de Labor / Manage (Lacostw41)")
     col_l1, col_l2 = st.columns(2)
     
     with col_l1:
+        # Seleccionamos si es Machine Category o Brand Rate Full
         tipo_mcbr = st.selectbox("MachCat/BandRate", df_mcbr['MCBR'])
-        # Carga dinámica de lista según selección
+        
+        # Filtramos qué tabla usar y qué columna mostrar en el desplegable
         if "Machine" in tipo_mcbr:
-            mcrr_list = df_lplat['Plat']
+            mcrr_list = df_lplat['Plat'].unique()
             df_ref = df_lplat
+            col_busqueda = 'Plat'
         else:
-            mcrr_list = df_lband['Def']
+            # Aquí corregimos para Band Rate Full
+            mcrr_list = df_lband['Def'].unique()
             df_ref = df_lband
+            col_busqueda = 'Def'
             
-        mcrr_sel = st.selectbox("MC/RR", mcrr_list)
+        mcrr_sel = st.selectbox("Seleccione MC/RR (Plataforma o Banda)", mcrr_list)
         
     with col_l2:
-        # Búsqueda del costo mensual en las tablas de labor según el país
+        # BUSCANDO EL COSTO EN EL ARCHIVO CSV
         try:
-            m_cost_raw = df_ref[df_ref.iloc[:, 2] == mcrr_sel][pais].values[0]
-            # Limpiar comas si vienen como string
-            m_cost = float(str(m_cost_raw).replace(',', '').replace(' ', '').replace('-', '0'))
-        except:
+            # Buscamos la fila que coincida con la selección y extraemos la columna del País seleccionado
+            valor_raw = df_ref[df_ref[col_busqueda] == mcrr_sel][pais].values[0]
+            
+            # LIMPIEZA DE DATOS: Quitamos comas, espacios y símbolos para que sea un número
+            if pd.isna(valor_raw) or str(valor_raw).strip() in ['', '-']:
+                m_cost = 0.0
+            else:
+                m_cost = float(str(valor_raw).replace(',', '').replace('"', '').strip())
+        except Exception as e:
             m_cost = 0.0
             
-        st.write(f"Costo Mensual Base ({pais}): {m_cost:,.2f}")
-        horas = st.number_input("Horas", value=1)
+        st.write(f"Costo Mensual Base detectado para {pais}: **{m_cost:,.2f}**")
+        
+        # Inputs adicionales
+        horas = st.number_input("Horas / QTY Labor", value=1, min_value=1)
+        m_start = st.date_input("Manage Start", s_start)
+        m_end = st.date_input("Manage End", s_end)
+        
+        # Duración Labor
+        dur_manage = (m_end.year - m_start.year) * 12 + (m_end.month - m_start.month)
+        if dur_manage <= 0: dur_manage = 1
 
     # ==========================================
-    # 6. OPERACIONES MATEMÁTICAS (LABOR)
+    # CÁLCULO MATEMÁTICO LABOR (SEGÚN UI_CONFIG)
     # ==========================================
-    total_manage = (m_cost * horas * duration)
-    # Ajuste de moneda
-    display_manage = total_manage if moneda == "Local" else (total_manage / er_actual if er_actual != 0 else 0)
+    # Fórmula: Costo * Horas * Duración
+    total_manage_base = (m_cost * horas * dur_manage)
+    
+    # Ajuste por moneda (Si es USD y el archivo está en Local, divide. Si es Local y está en Local, mantiene)
+    if moneda == "USD":
+        display_manage = total_manage_base / er_actual if er_actual != 0 else total_manage_base
+    else:
+        display_manage = total_manage_base
 
+    st.markdown("---")
     st.metric(f"Total Manage Cost ({moneda})", f"{display_manage:,.2f}")
+
+# TOTAL GLOBAL (Al final de los tabs)
+st.markdown("---")
+total_final_quote = display_cost + display_manage
+st.header(f"Total Final Cotización: {total_final_quote:,.2f} {moneda}")
 
 # ==========================================
 # 7. TOTAL FINAL (FOOTER)
