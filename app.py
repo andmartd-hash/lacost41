@@ -77,116 +77,78 @@ tab1, tab2 = st.tabs(["🛠 TAB 1: Servicios", "📊 TAB 2: Labor (Manage)"])
 
 # --- TAB 1: SERVICIOS ---
 with tab1:
-    col_a, col_b = st.columns(2)
+    st.subheader("Entrada de Datos de Servicio")
+    # [1, 1, 1, 2] crea 3 columnas delgadas y una doble de espacio vacío
+    col1, col2, col3, col_espacio = st.columns([1, 1, 1, 2]) 
     
-    with col_a:
-        st.subheader("Configuración de Servicio")
+    with col1:
         offering_sel = st.selectbox("Offering", df_offering['Offering'])
-        l40 = df_offering[df_offering['Offering'] == offering_sel]['L40'].values[0]
-        st.caption(f"L40: {l40}")
-        
         qty = st.number_input("Cantidad (QTY)", min_value=1, value=1)
-        
-        # Filtrado de SLC (Si es Brasil, mostrar específicos)
-        if pais == "Brazil":
-            slc_options = df_slc[df_slc['Scope'] == 'only Brazil']['SLC']
-        else:
-            slc_options = df_slc[df_slc['Scope'].isna()]['SLC']
-        
-        slc_sel = st.selectbox("SLC", slc_options)
-        uplf = df_slc[df_slc['SLC'] == slc_sel]['UPLF'].values[0]
-
-    with col_b:
-        st.subheader("Costos y Fechas")
+        # El costo unitario debajo de QTY para ahorrar espacio
+        u_cost_usd = st.number_input("Unit Cost USD", min_value=0.0, format="%.2f")
+    
+    with col2:
         s_start = st.date_input("Service Start", datetime.now())
         s_end = st.date_input("Service End", datetime.now())
-        # Cálculo de Duración (Meses)
-        duration = (s_end.year - s_start.year) * 12 + (s_end.month - s_start.month)
-        if duration <= 0: duration = 1
-        st.write(f"Duración: {duration} meses")
-
-        u_cost_usd = st.number_input("Unit Cost USD", min_value=0.0, format="%.2f")
         u_cost_local = st.number_input("Unit Cost Local", min_value=0.0, format="%.2f")
 
-    # ==========================================
-    # 5. OPERACIONES MATEMÁTICAS (SERVICIOS)
-    # ==========================================
-    # Fórmula según UI_CONFIG: ((USD + Local)*Duration)*QTY*UPLF
-    # Ajustado: Si moneda es Local, el resultado se multiplica/divide por ER
+    with col3:
+        slc_options = df_slc[df_slc['Scope'] == 'only Brazil']['SLC'] if pais == "Brazil" else df_slc[df_slc['Scope'].isna()]['SLC']
+        slc_sel = st.selectbox("SLC", slc_options)
+        
+        # Cálculo de Duración visible
+        duration = (s_end.year - s_start.year) * 12 + (s_end.month - s_start.month)
+        if duration <= 0: duration = 1
+        st.info(f"Duración: {duration} meses")
+
+    # --- Operación Matemática ---
+    uplf = df_slc[df_slc['SLC'] == slc_sel]['UPLF'].values[0]
     base_cost = (u_cost_usd + (u_cost_local / er_actual if er_actual != 0 else 0))
     total_service = (base_cost * duration) * qty * uplf
-    
-    # Si el usuario eligió ver en Local
     display_cost = total_service * er_actual if moneda == "Local" else total_service
 
     st.markdown("---")
     st.metric(f"Total Service Cost ({moneda})", f"{display_cost:,.2f}")
-
+    
 # --- TAB 2: LABOR ---
 with tab2:
-    st.subheader("Cálculos de Labor / Manage (Lacostw41)")
-    col_l1, col_l2 = st.columns(2)
+    st.subheader("Cálculos de Labor / Manage")
+    # Misma proporción para mantener simetría
+    col_l1, col_l2, col_l3, col_espacio_l = st.columns([1, 1, 1, 2])
     
     with col_l1:
-        # Seleccionamos si es Machine Category o Brand Rate Full
         tipo_mcbr = st.selectbox("MachCat/BandRate", df_mcbr['MCBR'])
+        mcrr_list = df_lplat['Plat'].unique() if "Machine" in tipo_mcbr else df_lband['Def'].unique()
+        col_busqueda = 'Plat' if "Machine" in tipo_mcbr else 'Def'
+        df_ref = df_lplat if "Machine" in tipo_mcbr else df_lband
         
-        # Filtramos qué tabla usar y qué columna mostrar en el desplegable
-        if "Machine" in tipo_mcbr:
-            mcrr_list = df_lplat['Plat'].unique()
-            df_ref = df_lplat
-            col_busqueda = 'Plat'
-        else:
-            # Aquí corregimos para Band Rate Full
-            mcrr_list = df_lband['Def'].unique()
-            df_ref = df_lband
-            col_busqueda = 'Def'
-            
-        mcrr_sel = st.selectbox("Seleccione MC/RR (Plataforma o Banda)", mcrr_list)
+        mcrr_sel = st.selectbox("Seleccione MC/RR", mcrr_list)
         
     with col_l2:
-        # BUSCANDO EL COSTO EN EL ARCHIVO CSV (Optimizado para Lacostw41)
+        # Búsqueda y Limpieza
         try:
-            # Buscamos la fila y extraemos el valor del país
-            fila_seleccionada = df_ref[df_ref[col_busqueda] == mcrr_sel]
-            valor_raw = fila_seleccionada[pais].values[0]
-            
-            # --- LIMPIADOR DE TEXTO A NÚMERO ---
-            if pd.isna(valor_raw) or str(valor_raw).strip() in ['', '-']:
-                m_cost = 0.0
-            else:
-                # Quitamos comas, espacios y convertimos a número flotante
-                limpio = str(valor_raw).replace(',', '').replace('"', '').strip()
-                m_cost = float(limpio)
-        except Exception:
+            valor_raw = df_ref[df_ref[col_busqueda] == mcrr_sel][pais].values[0]
+            m_cost = float(str(valor_raw).replace(',', '').replace('"', '').strip()) if not pd.isna(valor_raw) else 0.0
+        except:
             m_cost = 0.0
             
-        st.write(f"Costo Mensual Base detectado: **{m_cost:,.2f}**")
-        
-        # Inputs adicionales
-        horas = st.number_input("Horas / QTY Labor", value=1, min_value=1)
+        st.write(f"Costo Base: **{m_cost:,.2f}**")
+        horas = st.number_input("Horas", value=1, min_value=1)
+
+    with col_l3:
         m_start = st.date_input("Manage Start", s_start)
         m_end = st.date_input("Manage End", s_end)
         
-        # Duración Labor
-        dur_manage = (m_end.year - m_start.year) * 12 + (m_end.month - m_start.month)
-        if dur_manage <= 0: dur_manage = 1
-
-    # ==========================================
-    # CÁLCULO MATEMÁTICO LABOR (SEGÚN UI_CONFIG)
-    # ==========================================
-    # Fórmula: Costo * Horas * Duración
-    total_manage_base = (m_cost * horas * dur_manage)
+    # --- Operación Matemática ---
+    dur_manage = (m_end.year - m_start.year) * 12 + (m_end.month - m_start.month)
+    if dur_manage <= 0: dur_manage = 1
     
-    # Ajuste por moneda (Si es USD y el archivo está en Local, divide. Si es Local y está en Local, mantiene)
-    if moneda == "USD":
-        display_manage = total_manage_base / er_actual if er_actual != 0 else total_manage_base
-    else:
-        display_manage = total_manage_base
+    total_manage_base = (m_cost * horas * dur_manage)
+    display_manage = total_manage_base if moneda == "Local" else (total_manage_base / er_actual if er_actual != 0 else total_manage_base)
 
     st.markdown("---")
     st.metric(f"Total Manage Cost ({moneda})", f"{display_manage:,.2f}")
-
+    
 # TOTAL GLOBAL (Al final de los tabs)
 st.markdown("---")
 total_final_quote = display_cost + display_manage
