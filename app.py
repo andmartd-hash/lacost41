@@ -145,20 +145,23 @@ with tab2:
         mcrr_sel = st.selectbox("Seleccione MC/RR (Plataforma o Banda)", mcrr_list)
         
     with col_l2:
-        # BUSCANDO EL COSTO EN EL ARCHIVO CSV
+        # BUSCANDO EL COSTO EN EL ARCHIVO CSV (Optimizado para Lacostw41)
         try:
-            # Buscamos la fila que coincida con la selección y extraemos la columna del País seleccionado
-            valor_raw = df_ref[df_ref[col_busqueda] == mcrr_sel][pais].values[0]
+            # Buscamos la fila y extraemos el valor del país
+            fila_seleccionada = df_ref[df_ref[col_busqueda] == mcrr_sel]
+            valor_raw = fila_seleccionada[pais].values[0]
             
-            # LIMPIEZA DE DATOS: Quitamos comas, espacios y símbolos para que sea un número
+            # --- LIMPIADOR DE TEXTO A NÚMERO ---
             if pd.isna(valor_raw) or str(valor_raw).strip() in ['', '-']:
                 m_cost = 0.0
             else:
-                m_cost = float(str(valor_raw).replace(',', '').replace('"', '').strip())
-        except Exception as e:
+                # Quitamos comas, espacios y convertimos a número flotante
+                limpio = str(valor_raw).replace(',', '').replace('"', '').strip()
+                m_cost = float(limpio)
+        except Exception:
             m_cost = 0.0
             
-        st.write(f"Costo Mensual Base detectado para {pais}: **{m_cost:,.2f}**")
+        st.write(f"Costo Mensual Base detectado: **{m_cost:,.2f}**")
         
         # Inputs adicionales
         horas = st.number_input("Horas / QTY Labor", value=1, min_value=1)
