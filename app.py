@@ -132,7 +132,7 @@ with tab2:
         except:
             m_cost = 0.0
             
-        st.write(f"Costo Base: **{m_cost:,.2f}**")
+       # st.write(f"Costo Base: **{m_cost:,.2f}**")
         horas = st.number_input("Horas", value=1, min_value=1)
 
     with col_l3:
