@@ -1,0 +1,21 @@
+Scope,MC/RR,Plat,Def,Argentina,Chile,Colombia,Ecuador,Peru,Uruguay,Venezuela,Mexico,Brazil
+,Machine Category,System Z,A," 304,504.20 "," 2,165,270.42 "," 2,054,059.00 ", 991.21 ," 1,284.61 "," 30,167.40 "," 102,721.98 "," 12,857.25 ",
+,Machine Category,Power HE,C," 194,856.48 "," 486,361.26 "," 540,008.96 ", 340.52 , 505.85 ," 18,987.52 "," 40,555.17 "," 5,857.95 ",
+,Machine Category,Power LE,D," 162,675.24 "," 486,361.26 "," 379,581.99 ", 283.77 , 312.87 ," 10,986.02 "," 36,819.83 "," 3,860.85 ",
+,Machine Category,System X HE,E," 66,943.80 "," 101,090.22 "," 108,029.94 ", 153.10 , 211.05 ," 8,828.82 "," 112,860.78 "," 1,054.20 ",
+,Machine Category,System X LE,X," 66,661.56 "," 98,766.36 "," 103,295.64 ", 190.06 , 180.60 ," 6,803.75 "," 65,635.34 ", 850.50 ,
+,Machine Category,Storage HE,F," 148,260.84 "," 564,857.37 "," 661,284.59 ", 281.13 , 348.27 ," 17,101.98 "," 48,292.67 "," 3,239.25 ",
+,Machine Category,Storage LE,G," 119,748.72 "," 330,580.64 "," 133,969.75 ", 196.66 , 234.08 ," 10,952.68 "," 32,017.24 "," 2,928.45 ",
+,Machine Category,MVS LE,L," 6,061.55 "," 10,579.80 "," 17,897.25 ", 15.75 , 73.50 ," 2,502.94 "," 14,822.80 ", 245.70 ,
+,Machine Category,Lenovo PC,V," 27,730.08 "," 11,620.46 "," 17,897.25 ", 47.25 , 73.50 ," 1,763.29 "," 14,822.80 ", 822.15 ,
+,Machine Category,MVS HE,K," 25,004.70 "," 26,763.45 "," 17,897.25 ", 50.16 , 106.31 ," 2,888.20 "," 14,822.80 "," 2,790.90 ",
+,Machine Category,Tape HE,H," 148,260.84 "," 564,857.37 "," 661,284.59 ", 281.13 , 348.27 ," 17,101.98 "," 48,292.67 "," 3,239.25 ",
+,Machine Category,Tape LE,I," 119,748.72 "," 330,580.64 "," 133,969.75 ", 196.66 , 234.08 ," 10,952.68 "," 32,017.24 "," 2,928.45 ",
+only Brazil,Machine Category,System Z,1,,,,,,,,," 2,803.85 "
+only Brazil,Machine Category,Power HE,2,,,,,,,,," 1,516.61 "
+only Brazil,Machine Category,Power LE,3,,,,,,,,, 742.22 
+only Brazil,Machine Category,Storage HE,4Br,,,,,,,,," 1,403.43 "
+only Brazil,Machine Category,Storage LE,5Br,,,,,,,,, 536.45 
+only Brazil,Machine Category,Demais Produtos - Proxxi - Proxxi,B,,,,,,,,, 83.37 
+only Brazil,Machine Category,MVS LE,J,,,,,,,,, 130.87 
+only Brazil,Machine Category,MVS HE,L,,,,,,,,, 361.36 

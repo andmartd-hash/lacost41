@@ -1,0 +1,7 @@
+﻿Scope,Country,Argentina,Brazil,Chile,Chile,Colombia,Ecuador,Peru,Mexico,Uruguay,Venezuela
+,Currency,ARS,BRL,CLP,CLF,COP,USD,PEN,MXN,UYU,VES
+,ER,1428.948633,5.341035,934.704,0.0235809,3775.22225,1,3.3729225,18.420365,39.73184,235.28249
+,Tax,0.0529,0.1425,0,0,0.01,0,0,0,0,0.0155
+only Brazil,Tax SW,,0.0865,,,,,,,,
+only Brazil,Tax Doubltax,,0.1925,,,,,,,,
+only Brazil,Tax SWDoubl,,0.1365,,,,,,,,
